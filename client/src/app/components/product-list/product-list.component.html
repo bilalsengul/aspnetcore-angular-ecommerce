@@ -5,6 +5,9 @@
         <h5 class="mb-0">Products</h5>
       </div>
       <div class="card-body">
+        <!-- Error Alert -->
+        <app-error-alert></app-error-alert>
+
         <!-- Filters -->
         <div class="row mb-3">
           <div class="col-md-4">
@@ -95,11 +98,6 @@
       </div>
       <div class="card-body">
         <div *ngIf="cart && cart.items && cart.items.length > 0; else emptyCart">
-          <!-- Error Message -->
-          <div *ngIf="errorMessage" class="alert alert-danger mb-3">
-            {{ errorMessage }}
-          </div>
-          
           <div *ngFor="let item of cart.items" class="d-flex justify-content-between align-items-center mb-2">
             <div>
               <span>{{ item.product.name }}</span>
