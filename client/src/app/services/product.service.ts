@@ -42,4 +42,24 @@ export class ProductService {
   getCategories(): Observable<Category[]> {
     return this.http.get<Category[]>(`${this.apiUrl}/categories`);
   }
+
+  getTotalCount(
+    minPrice?: number,
+    maxPrice?: number,
+    categoryId?: number
+  ): Observable<number> {
+    let params = new HttpParams();
+
+    if (minPrice !== undefined) {
+      params = params.set('minPrice', minPrice.toString());
+    }
+    if (maxPrice !== undefined) {
+      params = params.set('maxPrice', maxPrice.toString());
+    }
+    if (categoryId !== undefined) {
+      params = params.set('categoryId', categoryId.toString());
+    }
+
+    return this.http.get<number>(`${this.apiUrl}/products/count`, { params });
+  }
 } 
