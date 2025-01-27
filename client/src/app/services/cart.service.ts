@@ -8,7 +8,7 @@ import { CartItem, CartSummary } from '../models/cart.model';
   providedIn: 'root'
 })
 export class CartService {
-  private apiUrl = 'http://localhost:5000/api';
+  private apiUrl = 'http://localhost:5111/api';
   private cartId: string;
   private cartItemCountSubject = new BehaviorSubject<number>(0);
   cartItemCount$ = this.cartItemCountSubject.asObservable();
@@ -37,8 +37,8 @@ export class CartService {
   addToCart(productId: number, quantity: number): Observable<CartItem> {
     return this.http.post<CartItem>(`${this.apiUrl}/cart`, {
       cartId: this.cartId,
-      productId,
-      quantity
+      productId: productId,
+      quantity: quantity
     }).pipe(
       tap(() => this.loadCart())
     );

@@ -21,7 +21,7 @@ export class ProductListComponent implements OnInit {
   selectedCategory: number | null = null;
   minPrice: number | null = null;
   maxPrice: number | null = null;
-  currentPage = 1;
+  page = 1;
   pageSize = 10;
   totalItems = 0;
   cart: CartSummary = {
@@ -51,7 +51,7 @@ export class ProductListComponent implements OnInit {
 
   loadProducts() {
     this.productService.getProducts(
-      this.currentPage,
+      this.page,
       this.pageSize,
       this.minPrice || undefined,
       this.maxPrice || undefined,
