@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace API.Models
 {
@@ -8,10 +9,18 @@ namespace API.Models
         public int Id { get; set; }
         public string OrderNumber { get; set; } = Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper();
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;
-        public string CartId { get; set; }
+
+        [Required]
+        public string CartId { get; set; } = string.Empty;
         public decimal TotalAmount { get; set; }
-        public string CustomerEmail { get; set; }
-        public string ShippingAddress { get; set; }
+
+        [Required]
+        [EmailAddress]
+        public string CustomerEmail { get; set; } = string.Empty;
+
+        [Required]
+        public string ShippingAddress { get; set; } = string.Empty;
+        
         public List<OrderItem> OrderItems { get; set; } = new();
     }
 } 
