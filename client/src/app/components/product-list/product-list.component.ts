@@ -38,6 +38,7 @@ export class ProductListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log('ProductListComponent initialized');
     this.loadCategories();
     this.loadProducts();
     this.cartService.getCartObservable().subscribe(cart => {
@@ -46,22 +47,42 @@ export class ProductListComponent implements OnInit {
   }
 
   loadCategories(): void {
-    this.productService.getCategories().subscribe(categories => {
-      this.categories = categories;
+    this.productService.getCategories().subscribe({
+      next: (categories) => {
+        console.log('Categories loaded:', categories);
+        this.categories = categories;
+      },
+      error: (error) => {
+        console.error('Error loading categories:', error);
+      }
     });
   }
 
   loadProducts(): void {
+    console.log('Loading products with params:', {
+      page: this.currentPage,
+      pageSize: this.pageSize,
+      category: this.selectedCategory,
+      minPrice: this.minPrice,
+      maxPrice: this.maxPrice
+    });
+
     this.productService.getProducts(
       this.currentPage,
       this.pageSize,
       this.selectedCategory,
       this.minPrice,
       this.maxPrice
-    ).subscribe(response => {
-      this.products = response.products;
-      this.totalItems = response.totalItems;
-      this.totalPages = Math.ceil(this.totalItems / this.pageSize);
+    ).subscribe({
+      next: (response) => {
+        console.log('Products loaded:', response);
+        this.products = response.products;
+        this.totalItems = response.totalItems;
+        this.totalPages = Math.ceil(this.totalItems / this.pageSize);
+      },
+      error: (error) => {
+        console.error('Error loading products:', error);
+      }
     });
   }
 
