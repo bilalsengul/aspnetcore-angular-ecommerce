@@ -26,31 +26,40 @@ namespace API.Controllers
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10)
         {
-            IQueryable<Product> products = _context.Products.Include(p => p.Category);
+            try
+            {
+                IQueryable<Product> products = _context.Products
+                    .Include(p => p.Category)
+                    .OrderBy(p => p.Id); // Add consistent ordering
 
-            // Apply filters
-            if (minPrice.HasValue)
-                products = products.Where(p => p.Price >= minPrice.Value);
+                // Apply filters
+                if (minPrice.HasValue)
+                    products = products.Where(p => p.Price >= minPrice.Value);
 
-            if (maxPrice.HasValue)
-                products = products.Where(p => p.Price <= maxPrice.Value);
+                if (maxPrice.HasValue)
+                    products = products.Where(p => p.Price <= maxPrice.Value);
 
-            if (categoryId.HasValue)
-                products = products.Where(p => p.CategoryId == categoryId.Value);
+                if (categoryId.HasValue)
+                    products = products.Where(p => p.CategoryId == categoryId.Value);
 
-            // Apply pagination
-            var totalItems = await products.CountAsync();
-            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+                // Apply pagination
+                var totalItems = await products.CountAsync();
+                var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-            var pagedProducts = await products
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+                var pagedProducts = await products
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
 
-            Response.Headers.Add("X-Total-Count", totalItems.ToString());
-            Response.Headers.Add("X-Total-Pages", totalPages.ToString());
+                Response.Headers["X-Total-Count"] = totalItems.ToString();
+                Response.Headers["X-Total-Pages"] = totalPages.ToString();
 
-            return Ok(pagedProducts);
+                return Ok(pagedProducts);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
         }
 
         [HttpGet("{id}")]
@@ -63,7 +72,7 @@ namespace API.Controllers
             if (product == null)
                 return NotFound();
 
-            return product;
+            return Ok(product);
         }
 
         [HttpGet("count")]
@@ -72,28 +81,26 @@ namespace API.Controllers
             [FromQuery] decimal? maxPrice,
             [FromQuery] int? categoryId)
         {
-            if (!_cache.TryGetValue(ProductsCacheKey, out IQueryable<Product> products))
+            try
             {
-                products = _context.Products
-                    .Include(p => p.Category);
+                IQueryable<Product> products = _context.Products;
 
-                var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(10));
+                // Apply filters
+                if (minPrice.HasValue)
+                    products = products.Where(p => p.Price >= minPrice.Value);
 
-                _cache.Set(ProductsCacheKey, products, cacheEntryOptions);
+                if (maxPrice.HasValue)
+                    products = products.Where(p => p.Price <= maxPrice.Value);
+
+                if (categoryId.HasValue)
+                    products = products.Where(p => p.CategoryId == categoryId.Value);
+
+                return await products.CountAsync();
             }
-
-            // Apply filters
-            if (minPrice.HasValue)
-                products = products.Where(p => p.Price >= minPrice.Value);
-
-            if (maxPrice.HasValue)
-                products = products.Where(p => p.Price <= maxPrice.Value);
-
-            if (categoryId.HasValue)
-                products = products.Where(p => p.CategoryId == categoryId.Value);
-
-            return await products.CountAsync();
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
         }
 
         // Additional endpoints can be added here for CRUD operations
