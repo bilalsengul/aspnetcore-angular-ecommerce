@@ -26,16 +26,7 @@ namespace API.Controllers
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10)
         {
-            if (!_cache.TryGetValue(ProductsCacheKey, out IQueryable<Product> products))
-            {
-                products = _context.Products
-                    .Include(p => p.Category);
-
-                var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(10));
-
-                _cache.Set(ProductsCacheKey, products, cacheEntryOptions);
-            }
+            IQueryable<Product> products = _context.Products.Include(p => p.Category);
 
             // Apply filters
             if (minPrice.HasValue)
@@ -73,6 +64,36 @@ namespace API.Controllers
                 return NotFound();
 
             return product;
+        }
+
+        [HttpGet("count")]
+        public async Task<ActionResult<int>> GetProductCount(
+            [FromQuery] decimal? minPrice,
+            [FromQuery] decimal? maxPrice,
+            [FromQuery] int? categoryId)
+        {
+            if (!_cache.TryGetValue(ProductsCacheKey, out IQueryable<Product> products))
+            {
+                products = _context.Products
+                    .Include(p => p.Category);
+
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(10));
+
+                _cache.Set(ProductsCacheKey, products, cacheEntryOptions);
+            }
+
+            // Apply filters
+            if (minPrice.HasValue)
+                products = products.Where(p => p.Price >= minPrice.Value);
+
+            if (maxPrice.HasValue)
+                products = products.Where(p => p.Price <= maxPrice.Value);
+
+            if (categoryId.HasValue)
+                products = products.Where(p => p.CategoryId == categoryId.Value);
+
+            return await products.CountAsync();
         }
 
         // Additional endpoints can be added here for CRUD operations
