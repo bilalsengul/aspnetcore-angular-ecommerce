@@ -25,16 +25,16 @@ export class ProductService {
     maxPrice?: number | null
   ): Observable<ProductResponse> {
     let params = new HttpParams()
-      .set('page', page.toString())
+      .set('pageNumber', (page - 1).toString())  // Convert to 0-based index
       .set('pageSize', pageSize.toString());
 
     if (categoryId) {
       params = params.set('categoryId', categoryId.toString());
     }
-    if (minPrice) {
+    if (minPrice !== undefined && minPrice !== null) {
       params = params.set('minPrice', minPrice.toString());
     }
-    if (maxPrice) {
+    if (maxPrice !== undefined && maxPrice !== null) {
       params = params.set('maxPrice', maxPrice.toString());
     }
 
