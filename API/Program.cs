@@ -18,12 +18,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularApp",
-        builder =>
-        {
-            builder.WithOrigins("http://localhost:4200", "http://localhost:56058")
-                   .AllowAnyHeader()
-                   .AllowAnyMethod();
-        });
+        builder => builder.AllowAnyOrigin()
+                         .AllowAnyHeader()
+                         .AllowAnyMethod());
 });
 
 // Add memory cache
