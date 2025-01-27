@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { Product, Category } from '../../models/product.model';
 import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
@@ -11,7 +10,7 @@ import { CartSummary } from '../../models/cart.model';
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, NgbPagination],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.css']
 })
@@ -24,6 +23,7 @@ export class ProductListComponent implements OnInit {
   currentPage = 1;
   pageSize = 10;
   totalItems = 0;
+  totalPages = 1;
   cart: CartSummary = {
     items: [],
     subtotal: 0,
@@ -52,29 +52,16 @@ export class ProductListComponent implements OnInit {
   }
 
   loadProducts(): void {
-    console.log('Loading products with params:', {
-      page: this.currentPage,
-      pageSize: this.pageSize,
-      category: this.selectedCategory,
-      minPrice: this.minPrice,
-      maxPrice: this.maxPrice
-    });
-    
     this.productService.getProducts(
       this.currentPage,
       this.pageSize,
       this.selectedCategory,
       this.minPrice,
       this.maxPrice
-    ).subscribe({
-      next: (response) => {
-        console.log('Products loaded:', response);
-        this.products = response.products;
-        this.totalItems = response.totalItems;
-      },
-      error: (error) => {
-        console.error('Error loading products:', error);
-      }
+    ).subscribe(response => {
+      this.products = response.products;
+      this.totalItems = response.totalItems;
+      this.totalPages = Math.ceil(this.totalItems / this.pageSize);
     });
   }
 
@@ -98,17 +85,15 @@ export class ProductListComponent implements OnInit {
     this.cartService.addToCart(productId).subscribe();
   }
 
-  updateQuantity(itemId: number, quantity: string | number): void {
-    const numericQuantity = Number(quantity);
-    if (numericQuantity > 0) {
-      this.cartService.updateQuantity(itemId, numericQuantity).subscribe();
-    } else {
-      this.removeFromCart(itemId);
+  updateQuantity(productId: number, quantity: string): void {
+    const newQuantity = parseInt(quantity, 10);
+    if (!isNaN(newQuantity) && newQuantity >= 0) {
+      this.cartService.updateQuantity(productId, newQuantity).subscribe();
     }
   }
 
-  removeFromCart(itemId: number): void {
-    this.cartService.removeFromCart(itemId).subscribe();
+  removeFromCart(productId: number): void {
+    this.cartService.removeFromCart(productId).subscribe();
   }
 
   getQuantityInCart(productId: number): number {

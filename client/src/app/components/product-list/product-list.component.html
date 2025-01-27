@@ -47,14 +47,21 @@
           </div>
         </div>
 
-        <!-- Pagination -->
+        <!-- Simple Pagination -->
         <div class="d-flex justify-content-center mt-4">
-          <ngb-pagination
-            [collectionSize]="totalItems"
-            [(page)]="currentPage"
-            [pageSize]="pageSize"
-            (pageChange)="loadProducts()"
-          ></ngb-pagination>
+          <nav>
+            <ul class="pagination">
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <button class="page-link" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+              </li>
+              <li class="page-item">
+                <span class="page-link">Page {{ currentPage }} of {{ totalPages }}</span>
+              </li>
+              <li class="page-item" [class.disabled]="currentPage === totalPages">
+                <button class="page-link" (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages">Next</button>
+              </li>
+            </ul>
+          </nav>
         </div>
       </div>
     </div>
