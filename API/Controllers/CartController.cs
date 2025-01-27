@@ -81,9 +81,10 @@ namespace API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteCartItem(int id)
+        public async Task<ActionResult> DeleteCartItem(int id, [FromQuery] string cartId)
         {
-            var cartItem = await _context.CartItems.FindAsync(id);
+            var cartItem = await _context.CartItems
+                .FirstOrDefaultAsync(ci => ci.Id == id && ci.CartId == cartId);
             
             if (cartItem == null)
                 return NotFound();

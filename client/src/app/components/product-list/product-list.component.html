@@ -112,7 +112,7 @@
                      [disabled]="isCartUpdating"
                      min="1">
               <button class="btn btn-sm btn-danger" 
-                      (click)="removeFromCart(item.productId)"
+                      (click)="removeFromCart(item.id)"
                       [disabled]="isCartUpdating">
                 <span *ngIf="!isCartUpdating">×</span>
                 <span *ngIf="isCartUpdating" class="spinner-border spinner-border-sm"></span>
