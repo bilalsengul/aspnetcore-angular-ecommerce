@@ -41,10 +41,6 @@ export class CartService {
     this.getCart().subscribe();
   }
 
-  getCartId(): string {
-    return this.cartId;
-  }
-
   getCart(): Observable<CartSummary> {
     return this.http.get<CartItem[]>(`${this.apiUrl}/${this.cartId}`).pipe(
       map(items => {
@@ -75,7 +71,11 @@ export class CartService {
   }
 
   updateQuantity(itemId: number, quantity: number): Observable<CartSummary> {
-    return this.http.put<CartItem>(`${this.apiUrl}/${itemId}`, { id: itemId, quantity }).pipe(
+    return this.http.put<CartItem>(`${this.apiUrl}/${itemId}`, { 
+      id: itemId,
+      quantity: quantity,
+      cartId: this.cartId
+    }).pipe(
       switchMap(() => this.getCart())
     );
   }
@@ -84,20 +84,6 @@ export class CartService {
     return this.http.delete<void>(`${this.apiUrl}/${itemId}`).pipe(
       map(() => {
         this.loadCart();
-      })
-    );
-  }
-
-  clearCart(): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${this.cartId}`).pipe(
-      map(() => {
-        this.cartSubject.next({
-          items: [],
-          subtotal: 0,
-          vat: 0,
-          total: 0,
-          itemCount: 0
-        });
       })
     );
   }

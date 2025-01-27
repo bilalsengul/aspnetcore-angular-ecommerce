@@ -177,8 +177,7 @@
   }
 </style>
 
-<!-- Navigation -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
   <div class="container">
     <a class="navbar-brand" routerLink="/">E-Commerce Store</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -188,8 +187,7 @@
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
           <a class="nav-link" routerLink="/cart">
-            <i class="bi bi-cart"></i> Cart
-            <span class="badge bg-primary" *ngIf="cartItemCount > 0">{{cartItemCount}}</span>
+            Cart ({{ cartSummary.itemCount }})
           </a>
         </li>
       </ul>
@@ -197,7 +195,6 @@
   </div>
 </nav>
 
-<!-- Main Content -->
 <div class="container mt-4">
   <router-outlet></router-outlet>
 </div>

@@ -23,22 +23,22 @@ export class ProductService {
     categoryId?: number | null,
     minPrice?: number | null,
     maxPrice?: number | null
-  ): Observable<Product[] | ProductResponse> {
+  ): Observable<ProductResponse> {
     let params = new HttpParams()
-      .set('pageNumber', (page - 1).toString())  // Convert to 0-based index
+      .set('page', page.toString())
       .set('pageSize', pageSize.toString());
 
     if (categoryId) {
       params = params.set('categoryId', categoryId.toString());
     }
-    if (minPrice !== undefined && minPrice !== null) {
+    if (minPrice) {
       params = params.set('minPrice', minPrice.toString());
     }
-    if (maxPrice !== undefined && maxPrice !== null) {
+    if (maxPrice) {
       params = params.set('maxPrice', maxPrice.toString());
     }
 
-    return this.http.get<Product[] | ProductResponse>(`${this.apiUrl}/products`, { params });
+    return this.http.get<ProductResponse>(`${this.apiUrl}/products`, { params });
   }
 
   getProduct(id: number): Observable<Product> {

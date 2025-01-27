@@ -46,8 +46,11 @@
                 <p class="card-text text-truncate">{{ product.description }}</p>
                 <p class="card-text"><strong>Price: ${{ product.price.toFixed(2) }}</strong></p>
                 <div class="d-flex justify-content-between align-items-center">
-                  <button class="btn btn-primary" (click)="addToCart(product.id)">
-                    Add to Cart
+                  <button class="btn btn-primary" 
+                          (click)="addToCart(product.id)"
+                          [disabled]="isCartUpdating">
+                    <span *ngIf="!isCartUpdating">Add to Cart</span>
+                    <span *ngIf="isCartUpdating" class="spinner-border spinner-border-sm"></span>
                   </button>
                   <a [routerLink]="['/products', product.id]" class="btn btn-outline-secondary">
                     Details
@@ -92,6 +95,11 @@
       </div>
       <div class="card-body">
         <div *ngIf="cart && cart.items && cart.items.length > 0; else emptyCart">
+          <!-- Error Message -->
+          <div *ngIf="errorMessage" class="alert alert-danger mb-3">
+            {{ errorMessage }}
+          </div>
+          
           <div *ngFor="let item of cart.items" class="d-flex justify-content-between align-items-center mb-2">
             <div>
               <span>{{ item.product.name }}</span>
@@ -100,8 +108,16 @@
             </div>
             <div class="d-flex align-items-center">
               <input type="number" class="form-control form-control-sm me-2" style="width: 60px"
-                     [value]="item.quantity" #quantityInput (change)="updateQuantity(item.productId, quantityInput.value)">
-              <button class="btn btn-sm btn-danger" (click)="removeFromCart(item.productId)">×</button>
+                     [value]="item.quantity" #quantityInput 
+                     (change)="updateQuantity(item.id, quantityInput.value)"
+                     [disabled]="isCartUpdating"
+                     min="1">
+              <button class="btn btn-sm btn-danger" 
+                      (click)="removeFromCart(item.productId)"
+                      [disabled]="isCartUpdating">
+                <span *ngIf="!isCartUpdating">×</span>
+                <span *ngIf="isCartUpdating" class="spinner-border spinner-border-sm"></span>
+              </button>
             </div>
           </div>
           <hr>

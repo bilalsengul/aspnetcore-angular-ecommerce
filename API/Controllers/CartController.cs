@@ -60,8 +60,12 @@ namespace API.Controllers
             if (id != cartItem.Id)
                 return BadRequest();
 
-            _context.Entry(cartItem).State = EntityState.Modified;
+            var existingItem = await _context.CartItems.FindAsync(id);
+            if (existingItem == null)
+                return NotFound();
 
+            existingItem.Quantity = cartItem.Quantity;
+            
             try
             {
                 await _context.SaveChangesAsync();

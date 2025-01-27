@@ -6,25 +6,26 @@ import { Product, Category } from '../../models/product.model';
 import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
 import { CartSummary } from '../../models/cart.model';
+import { ErrorService } from '../../services/error.service';
+import { ErrorAlertComponent } from '../shared/error-alert/error-alert.component';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, ErrorAlertComponent],
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.css']
 })
 export class ProductListComponent implements OnInit {
   products: Product[] = [];
   categories: Category[] = [];
-  selectedCategory: number | null = null;
-  minPrice: number | null = null;
-  maxPrice: number | null = null;
+  selectedCategory: number | undefined;
+  minPrice: number | undefined;
+  maxPrice: number | undefined;
   currentPage = 1;
   pageSize = 10;
   totalItems = 0;
   totalPages = 1;
-  isLoading = false;
   cart: CartSummary = {
     items: [],
     subtotal: 0,
@@ -32,10 +33,13 @@ export class ProductListComponent implements OnInit {
     total: 0,
     itemCount: 0
   };
+  isCartUpdating = false;
+  errorMessage: string | null = null;
 
   constructor(
     private productService: ProductService,
-    private cartService: CartService
+    private cartService: CartService,
+    private errorService: ErrorService
   ) {}
 
   ngOnInit(): void {
@@ -53,7 +57,7 @@ export class ProductListComponent implements OnInit {
         };
       },
       error: (error) => {
-        console.error('Error loading cart:', error);
+        this.errorService.handleError(error);
         this.cart = {
           items: [],
           subtotal: 0,
@@ -72,8 +76,7 @@ export class ProductListComponent implements OnInit {
         this.categories = categories;
       },
       error: (error) => {
-        console.error('Error loading categories:', error);
-        this.categories = [];
+        this.errorService.handleError(error);
       }
     });
   }
@@ -87,8 +90,7 @@ export class ProductListComponent implements OnInit {
       maxPrice: this.maxPrice
     });
 
-    this.isLoading = true;
-
+    this.products = []; // Reset products while loading
     this.productService.getProducts(
       this.currentPage,
       this.pageSize,
@@ -97,35 +99,23 @@ export class ProductListComponent implements OnInit {
       this.maxPrice
     ).subscribe({
       next: (response) => {
-        console.log('Raw API response:', response);
-        if (Array.isArray(response)) {
-          this.products = response;
-          this.totalItems = response.length;
-          this.totalPages = Math.max(1, Math.ceil(this.totalItems / this.pageSize));
-          console.log('Products loaded successfully:', {
-            products: this.products,
-            totalItems: this.totalItems,
-            totalPages: this.totalPages
-          });
-        } else if (response && response.products) {
-          this.products = response.products;
-          this.totalItems = response.totalItems;
+        if (response) {
+          console.log('Products loaded:', response);
+          this.products = response.products || [];
+          this.totalItems = response.totalItems || 0;
           this.totalPages = Math.max(1, Math.ceil(this.totalItems / this.pageSize));
         } else {
-          console.error('Invalid API response format:', response);
+          this.errorService.handleError(new Error('No response received from products API'));
           this.products = [];
           this.totalItems = 0;
           this.totalPages = 1;
         }
       },
       error: (error) => {
-        console.error('Error loading products:', error);
+        this.errorService.handleError(error);
         this.products = [];
         this.totalItems = 0;
         this.totalPages = 1;
-      },
-      complete: () => {
-        this.isLoading = false;
       }
     });
   }
@@ -148,22 +138,65 @@ export class ProductListComponent implements OnInit {
   }
 
   addToCart(productId: number): void {
-    this.cartService.addToCart(productId).subscribe();
+    this.isCartUpdating = true;
+    
+    this.cartService.addToCart(productId).subscribe({
+      next: () => {
+        this.isCartUpdating = false;
+      },
+      error: (error) => {
+        this.errorService.handleError(error);
+        this.isCartUpdating = false;
+      }
+    });
   }
 
-  updateQuantity(productId: number, quantity: string): void {
+  updateQuantity(itemId: number, quantity: string): void {
     const newQuantity = parseInt(quantity, 10);
     if (!isNaN(newQuantity) && newQuantity >= 0) {
-      this.cartService.updateQuantity(productId, newQuantity).subscribe();
+      this.isCartUpdating = true;
+      
+      this.cartService.updateQuantity(itemId, newQuantity).subscribe({
+        next: () => {
+          this.isCartUpdating = false;
+        },
+        error: (error) => {
+          this.errorService.handleError(error);
+          this.isCartUpdating = false;
+          this.loadCart();
+        }
+      });
     }
   }
 
   removeFromCart(productId: number): void {
-    this.cartService.removeFromCart(productId).subscribe();
+    this.isCartUpdating = true;
+    
+    this.cartService.removeFromCart(productId).subscribe({
+      next: () => {
+        this.isCartUpdating = false;
+      },
+      error: (error) => {
+        this.errorService.handleError(error);
+        this.isCartUpdating = false;
+        this.loadCart();
+      }
+    });
   }
 
   getQuantityInCart(productId: number): number {
     const cartItem = this.cart.items.find(item => item.product.id === productId);
     return cartItem ? cartItem.quantity : 0;
+  }
+
+  private loadCart(): void {
+    this.cartService.getCart().subscribe({
+      next: (cart) => {
+        this.cart = cart;
+      },
+      error: (error) => {
+        this.errorService.handleError(error);
+      }
+    });
   }
 } 

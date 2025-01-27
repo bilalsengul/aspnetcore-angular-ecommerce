@@ -1,8 +1,4 @@
 <div class="container" *ngIf="cart">
-  <div class="alert alert-danger" *ngIf="errorMessage">
-    {{ errorMessage }}
-  </div>
-
   <div class="row">
     <div class="col-md-8">
       <div class="card">
@@ -49,10 +45,7 @@
                      [(ngModel)]="shippingInfo.zipCode" name="zipCode" required>
             </div>
             
-            <button type="submit" class="btn btn-primary" [disabled]="isSubmitting">
-              <span class="spinner-border spinner-border-sm me-2" *ngIf="isSubmitting"></span>
-              {{ isSubmitting ? 'Placing Order...' : 'Place Order' }}
-            </button>
+            <button type="submit" class="btn btn-primary">Place Order</button>
           </form>
         </div>
       </div>
