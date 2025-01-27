@@ -6,116 +6,14 @@ import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { Product, Category } from '../../models/product.model';
 import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
+import { CartSummary } from '../../models/cart.model';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, NgbPagination],
-  template: `
-    <div class="row mb-4">
-      <div class="col-md-8">
-        <div class="card">
-          <div class="card-header">
-            <h5 class="mb-0">Products</h5>
-          </div>
-          <div class="card-body">
-            <!-- Filters -->
-            <div class="row mb-3">
-              <div class="col-md-4">
-                <select class="form-select" [(ngModel)]="selectedCategory" (change)="loadProducts()">
-                  <option [ngValue]="null">All Categories</option>
-                  <option *ngFor="let category of categories" [ngValue]="category.id">
-                    {{ category.name }}
-                  </option>
-                </select>
-              </div>
-              <div class="col-md-4">
-                <input type="number" class="form-control" placeholder="Min Price" 
-                       [(ngModel)]="minPrice" (change)="loadProducts()">
-              </div>
-              <div class="col-md-4">
-                <input type="number" class="form-control" placeholder="Max Price" 
-                       [(ngModel)]="maxPrice" (change)="loadProducts()">
-              </div>
-            </div>
-
-            <!-- Product Grid -->
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-              <div class="col" *ngFor="let product of products">
-                <div class="card h-100">
-                  <img [src]="product.imageUrl" class="card-img-top" [alt]="product.name">
-                  <div class="card-body">
-                    <h5 class="card-title">{{ product.name }}</h5>
-                    <p class="card-text">{{ product.description }}</p>
-                    <p class="card-text"><strong>Price: ${{ product.price }}</strong></p>
-                    <div class="d-flex justify-content-between align-items-center">
-                      <button class="btn btn-primary" (click)="addToCart(product)">
-                        Add to Cart
-                      </button>
-                      <a [routerLink]="['/products', product.id]" class="btn btn-outline-secondary">
-                        Details
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Pagination -->
-            <div class="d-flex justify-content-center mt-4">
-              <ngb-pagination
-                [collectionSize]="totalItems"
-                [(page)]="currentPage"
-                [pageSize]="pageSize"
-                (pageChange)="loadProducts()"
-              ></ngb-pagination>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Cart Summary -->
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-header">
-            <h5 class="mb-0">Cart</h5>
-          </div>
-          <div class="card-body">
-            <div *ngIf="cart?.items?.length; else emptyCart">
-              <div *ngFor="let item of cart.items" class="d-flex justify-content-between align-items-center mb-2">
-                <div>
-                  <span>{{ item.product.name }}</span>
-                  <br>
-                  <small class="text-muted">${{ item.product.price }} × {{ item.quantity }}</small>
-                </div>
-                <div class="d-flex align-items-center">
-                  <input type="number" class="form-control form-control-sm me-2" style="width: 60px"
-                         [value]="item.quantity" (change)="updateQuantity(item.productId, $event)">
-                  <button class="btn btn-sm btn-danger" (click)="removeFromCart(item.productId)">×</button>
-                </div>
-              </div>
-              <hr>
-              <div class="d-flex justify-content-between">
-                <span>Subtotal:</span>
-                <span>${{ cart.subtotal.toFixed(2) }}</span>
-              </div>
-              <div class="d-flex justify-content-between">
-                <span>VAT (20%):</span>
-                <span>${{ cart.vat.toFixed(2) }}</span>
-              </div>
-              <div class="d-flex justify-content-between fw-bold mt-2">
-                <span>Total:</span>
-                <span>${{ cart.total.toFixed(2) }}</span>
-              </div>
-            </div>
-            <ng-template #emptyCart>
-              <p class="text-center mb-0">Your cart is empty</p>
-            </ng-template>
-          </div>
-        </div>
-      </div>
-    </div>
-  `
+  templateUrl: './product-list.component.html',
+  styles: []
 })
 export class ProductListComponent implements OnInit {
   products: Product[] = [];
@@ -126,7 +24,7 @@ export class ProductListComponent implements OnInit {
   currentPage = 1;
   pageSize = 10;
   totalItems = 0;
-  cart: any;
+  cart: CartSummary | null = null;
 
   constructor(
     private productService: ProductService,
@@ -172,8 +70,9 @@ export class ProductListComponent implements OnInit {
     });
   }
 
-  updateQuantity(productId: number, event: any) {
-    const quantity = parseInt(event.target.value);
+  updateQuantity(productId: number, event: Event) {
+    const input = event.target as HTMLInputElement;
+    const quantity = parseInt(input.value);
     if (quantity > 0) {
       this.cartService.updateQuantity(productId, quantity).subscribe(() => {
         this.loadCart();
