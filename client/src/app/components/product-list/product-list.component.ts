@@ -52,15 +52,29 @@ export class ProductListComponent implements OnInit {
   }
 
   loadProducts(): void {
+    console.log('Loading products with params:', {
+      page: this.currentPage,
+      pageSize: this.pageSize,
+      category: this.selectedCategory,
+      minPrice: this.minPrice,
+      maxPrice: this.maxPrice
+    });
+    
     this.productService.getProducts(
       this.currentPage,
       this.pageSize,
       this.selectedCategory,
       this.minPrice,
       this.maxPrice
-    ).subscribe(response => {
-      this.products = response.products;
-      this.totalItems = response.totalItems;
+    ).subscribe({
+      next: (response) => {
+        console.log('Products loaded:', response);
+        this.products = response.products;
+        this.totalItems = response.totalItems;
+      },
+      error: (error) => {
+        console.error('Error loading products:', error);
+      }
     });
   }
 
@@ -84,9 +98,10 @@ export class ProductListComponent implements OnInit {
     this.cartService.addToCart(productId).subscribe();
   }
 
-  updateQuantity(itemId: number, quantity: number): void {
-    if (quantity > 0) {
-      this.cartService.updateQuantity(itemId, quantity).subscribe();
+  updateQuantity(itemId: number, quantity: string | number): void {
+    const numericQuantity = Number(quantity);
+    if (numericQuantity > 0) {
+      this.cartService.updateQuantity(itemId, numericQuantity).subscribe();
     } else {
       this.removeFromCart(itemId);
     }
@@ -100,5 +115,4 @@ export class ProductListComponent implements OnInit {
     const cartItem = this.cart.items.find(item => item.product.id === productId);
     return cartItem ? cartItem.quantity : 0;
   }
-} 
 } 
