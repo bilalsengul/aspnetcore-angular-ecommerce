@@ -26,6 +26,7 @@ export class ProductListComponent implements OnInit {
   pageSize = 10;
   totalItems = 0;
   totalPages = 1;
+  isLoading = false;
   cart: CartSummary = {
     items: [],
     subtotal: 0,
@@ -82,6 +83,7 @@ export class ProductListComponent implements OnInit {
   }
 
   loadProducts(): void {
+    this.isLoading = true;
     console.log('Loading products with params:', {
       page: this.currentPage,
       pageSize: this.pageSize,
@@ -110,12 +112,14 @@ export class ProductListComponent implements OnInit {
           this.totalItems = 0;
           this.totalPages = 1;
         }
+        this.isLoading = false;
       },
       error: (error) => {
         this.errorService.handleError(error);
         this.products = [];
         this.totalItems = 0;
         this.totalPages = 1;
+        this.isLoading = false;
       }
     });
   }

@@ -42,8 +42,9 @@
                    class="card-img-top product-image"
                    width="300"
                    height="300"
-                   (error)="product.imageUrl = 'https://placehold.co/300x300?text=Product+Image'"
-                   loading="lazy">
+                   (error)="product.imageUrl = 'https://placehold.co/300x300/e2e8f0/1e293b?text=' + product.name"
+                   loading="lazy"
+                   style="object-fit: cover;">
               <div class="card-body">
                 <h5 class="card-title">{{ product.name }}</h5>
                 <p class="card-text text-truncate">{{ product.description }}</p>

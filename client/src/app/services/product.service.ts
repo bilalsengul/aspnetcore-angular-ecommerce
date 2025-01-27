@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product, Category } from '../models/product.model';
 import { environment } from '../../environments/environment';
+import { map } from 'rxjs/operators';
 
 export interface ProductResponse {
   products: Product[];
@@ -38,7 +39,12 @@ export class ProductService {
       params = params.set('maxPrice', maxPrice.toString());
     }
 
-    return this.http.get<ProductResponse>(`${this.apiUrl}/products`, { params });
+    return this.http.get<Product[]>(`${this.apiUrl}/products`, { params }).pipe(
+      map(products => ({
+        products,
+        totalItems: products.length
+      }))
+    );
   }
 
   getProduct(id: number): Observable<Product> {
