@@ -37,25 +37,25 @@ export class ProductListComponent implements OnInit {
     private cartService: CartService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadCategories();
     this.loadProducts();
     this.loadCart();
   }
 
-  loadCategories() {
+  loadCategories(): void {
     this.productService.getCategories().subscribe(categories => {
       this.categories = categories;
     });
   }
 
-  loadProducts() {
+  loadProducts(): void {
     this.productService.getProducts(
       this.page,
       this.pageSize,
-      this.minPrice || undefined,
-      this.maxPrice || undefined,
-      this.selectedCategory || undefined
+      this.minPrice ?? undefined,
+      this.maxPrice ?? undefined,
+      this.selectedCategory ?? undefined
     ).subscribe(products => {
       this.products = products;
       // Get total count from headers
@@ -64,19 +64,19 @@ export class ProductListComponent implements OnInit {
     });
   }
 
-  loadCart() {
+  loadCart(): void {
     this.cartService.getCart().subscribe(cart => {
       this.cart = cart;
     });
   }
 
-  addToCart(product: Product) {
+  addToCart(product: Product): void {
     this.cartService.addToCart(product.id, 1).subscribe(() => {
       this.loadCart();
     });
   }
 
-  updateQuantity(productId: number, event: Event) {
+  updateQuantity(productId: number, event: Event): void {
     const input = event.target as HTMLInputElement;
     const quantity = parseInt(input.value);
     if (quantity > 0) {
@@ -86,7 +86,7 @@ export class ProductListComponent implements OnInit {
     }
   }
 
-  removeFromCart(productId: number) {
+  removeFromCart(productId: number): void {
     this.cartService.removeFromCart(productId).subscribe(() => {
       this.loadCart();
     });
