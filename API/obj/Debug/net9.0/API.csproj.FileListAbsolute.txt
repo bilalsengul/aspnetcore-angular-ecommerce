@@ -1,0 +1,8 @@
+/Users/bilalsengul/Desktop/CURSOR/Case A/aspnetcore-angular-ecommerce/API/obj/Debug/net9.0/API.csproj.AssemblyReference.cache
+/Users/bilalsengul/Desktop/CURSOR/Case A/aspnetcore-angular-ecommerce/API/obj/Debug/net9.0/API.GeneratedMSBuildEditorConfig.editorconfig
+/Users/bilalsengul/Desktop/CURSOR/Case A/aspnetcore-angular-ecommerce/API/obj/Debug/net9.0/API.AssemblyInfoInputs.cache
+/Users/bilalsengul/Desktop/CURSOR/Case A/aspnetcore-angular-ecommerce/API/obj/Debug/net9.0/API.AssemblyInfo.cs
+/Users/bilalsengul/Desktop/CURSOR/Case A/aspnetcore-angular-ecommerce/API/obj/Debug/net9.0/API.csproj.CoreCompileInputs.cache
+/Users/bilalsengul/Desktop/CURSOR/Case A/aspnetcore-angular-ecommerce/API/obj/Debug/net9.0/API.MvcApplicationPartsAssemblyInfo.cs
+/Users/bilalsengul/Desktop/CURSOR/Case A/aspnetcore-angular-ecommerce/API/obj/Debug/net9.0/API.MvcApplicationPartsAssemblyInfo.cache
+/Users/bilalsengul/Desktop/CURSOR/Case A/aspnetcore-angular-ecommerce/API/obj/Debug/net9.0/API.sourcelink.json
