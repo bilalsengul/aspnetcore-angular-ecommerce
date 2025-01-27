@@ -24,7 +24,13 @@ export class ProductListComponent implements OnInit {
   currentPage = 1;
   pageSize = 10;
   totalItems = 0;
-  cart: CartSummary | null = null;
+  cart: CartSummary = {
+    items: [],
+    subtotal: 0,
+    vat: 0,
+    total: 0,
+    itemCount: 0
+  };
 
   constructor(
     private productService: ProductService,

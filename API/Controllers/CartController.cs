@@ -38,28 +38,28 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<CartItem>> AddToCart(string cartId, int productId, int quantity)
+        public async Task<ActionResult<CartItem>> AddToCart([FromBody] AddToCartRequest request)
         {
-            var product = await _context.Products.FindAsync(productId);
+            var product = await _context.Products.FindAsync(request.ProductId);
             if (product == null)
                 return NotFound("Product not found");
 
             var cartItem = await _context.CartItems
-                .FirstOrDefaultAsync(ci => ci.CartId == cartId && ci.ProductId == productId);
+                .FirstOrDefaultAsync(ci => ci.CartId == request.CartId && ci.ProductId == request.ProductId);
 
             if (cartItem == null)
             {
                 cartItem = new CartItem
                 {
-                    CartId = cartId,
-                    ProductId = productId,
-                    Quantity = quantity
+                    CartId = request.CartId,
+                    ProductId = request.ProductId,
+                    Quantity = request.Quantity
                 };
                 _context.CartItems.Add(cartItem);
             }
             else
             {
-                cartItem.Quantity += quantity;
+                cartItem.Quantity += request.Quantity;
             }
 
             await _context.SaveChangesAsync();
