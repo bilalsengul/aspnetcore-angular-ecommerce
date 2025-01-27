@@ -11,27 +11,29 @@ import { CartService } from '../../services/cart.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="row" *ngIf="product">
-      <div class="col-md-6">
-        <img [src]="product.imageUrl" [alt]="product.name" class="img-fluid">
-      </div>
-      <div class="col-md-6">
-        <h2>{{ product.name }}</h2>
-        <p class="text-muted">Category: {{ product.category?.name }}</p>
-        <p>{{ product.description }}</p>
-        <h3 class="mb-3">${{ product.price }}</h3>
-        
-        <div class="d-flex align-items-center mb-3">
-          <label class="me-2">Quantity:</label>
-          <input type="number" class="form-control" style="width: 100px"
-                 [(ngModel)]="quantity" min="1">
+    <ng-container *ngIf="product">
+      <div class="row">
+        <div class="col-md-6">
+          <img [src]="product.imageUrl" [alt]="product.name" class="img-fluid">
         </div>
-        
-        <button class="btn btn-primary" (click)="addToCart()">
-          Add to Cart
-        </button>
+        <div class="col-md-6">
+          <h2>{{ product.name }}</h2>
+          <p class="text-muted">Category: {{ product.category?.name }}</p>
+          <p>{{ product.description }}</p>
+          <h3 class="mb-3">${{ product.price }}</h3>
+          
+          <div class="d-flex align-items-center mb-3">
+            <label class="me-2">Quantity:</label>
+            <input type="number" class="form-control" style="width: 100px"
+                   [(ngModel)]="quantity" min="1">
+          </div>
+          
+          <button class="btn btn-primary" (click)="addToCart()">
+            Add to Cart
+          </button>
+        </div>
       </div>
-    </div>
+    </ng-container>
   `
 })
 export class ProductDetailComponent implements OnInit {
