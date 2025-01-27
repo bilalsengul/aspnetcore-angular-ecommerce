@@ -67,8 +67,8 @@
         <h5 class="mb-0">Cart</h5>
       </div>
       <div class="card-body">
-        <div *ngIf="cart?.items?.length; else emptyCart">
-          <div *ngFor="let item of cart?.items" class="d-flex justify-content-between align-items-center mb-2">
+        <div *ngIf="cart.items.length; else emptyCart">
+          <div *ngFor="let item of cart.items" class="d-flex justify-content-between align-items-center mb-2">
             <div>
               <span>{{ item.product.name }}</span>
               <br>
@@ -83,15 +83,15 @@
           <hr>
           <div class="d-flex justify-content-between">
             <span>Subtotal:</span>
-            <span>${{ cart?.subtotal?.toFixed(2) }}</span>
+            <span>${{ cart.subtotal.toFixed(2) }}</span>
           </div>
           <div class="d-flex justify-content-between">
             <span>VAT (20%):</span>
-            <span>${{ cart?.vat?.toFixed(2) }}</span>
+            <span>${{ cart.vat.toFixed(2) }}</span>
           </div>
           <div class="d-flex justify-content-between fw-bold mt-2">
             <span>Total:</span>
-            <span>${{ cart?.total?.toFixed(2) }}</span>
+            <span>${{ cart.total.toFixed(2) }}</span>
           </div>
         </div>
         <ng-template #emptyCart>

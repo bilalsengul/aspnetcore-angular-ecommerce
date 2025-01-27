@@ -58,9 +58,13 @@ export class ProductListComponent implements OnInit {
       this.selectedCategory ?? undefined
     ).subscribe(products => {
       this.products = products;
-      // Get total count from headers
-      const totalCount = products.length; // This should come from headers
-      this.totalItems = totalCount;
+      this.productService.getTotalCount(
+        this.minPrice ?? undefined,
+        this.maxPrice ?? undefined,
+        this.selectedCategory ?? undefined
+      ).subscribe(count => {
+        this.totalItems = count;
+      });
     });
   }
 
