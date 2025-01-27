@@ -41,6 +41,9 @@ export class ProductListComponent implements OnInit {
     this.loadCategories();
     this.loadProducts();
     this.loadCart();
+    this.cartService.getCartObservable().subscribe(cart => {
+      this.cart = cart;
+    });
   }
 
   loadCategories(): void {
@@ -53,18 +56,12 @@ export class ProductListComponent implements OnInit {
     this.productService.getProducts(
       this.page,
       this.pageSize,
+      this.selectedCategory ?? undefined,
       this.minPrice ?? undefined,
-      this.maxPrice ?? undefined,
-      this.selectedCategory ?? undefined
-    ).subscribe(products => {
+      this.maxPrice ?? undefined
+    ).subscribe(({ products, totalItems }) => {
       this.products = products;
-      this.productService.getTotalCount(
-        this.minPrice ?? undefined,
-        this.maxPrice ?? undefined,
-        this.selectedCategory ?? undefined
-      ).subscribe(count => {
-        this.totalItems = count;
-      });
+      this.totalItems = totalItems;
     });
   }
 
@@ -75,24 +72,23 @@ export class ProductListComponent implements OnInit {
   }
 
   addToCart(product: Product): void {
-    this.cartService.addToCart(product.id, 1).subscribe(() => {
-      this.loadCart();
-    });
+    this.cartService.addToCart(product.id, 1).subscribe();
   }
 
   updateQuantity(productId: number, event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const quantity = parseInt(input.value);
+    const quantity = parseInt((event.target as HTMLInputElement).value, 10);
     if (quantity > 0) {
-      this.cartService.updateQuantity(productId, quantity).subscribe(() => {
-        this.loadCart();
-      });
+      const cartItem = this.cart.items.find(item => item.productId === productId);
+      if (cartItem) {
+        this.cartService.updateQuantity(cartItem.id, quantity).subscribe();
+      }
     }
   }
 
   removeFromCart(productId: number): void {
-    this.cartService.removeFromCart(productId).subscribe(() => {
-      this.loadCart();
-    });
+    const cartItem = this.cart.items.find(item => item.productId === productId);
+    if (cartItem) {
+      this.cartService.removeFromCart(cartItem.id).subscribe();
+    }
   }
 } 

@@ -1,24 +1,30 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { CommonModule } from '@angular/common';
+import { RouterOutlet } from '@angular/router';
 import { CartService } from './services/cart.service';
-import { HttpClientModule } from '@angular/common/http';
+import { CartSummary } from './models/cart.model';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgbModule, HttpClientModule]
+  imports: [CommonModule, RouterOutlet],
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  cartItemCount: number = 0;
+  cartSummary: CartSummary = {
+    items: [],
+    subtotal: 0,
+    vat: 0,
+    total: 0,
+    itemCount: 0
+  };
 
   constructor(private cartService: CartService) {}
 
   ngOnInit() {
-    this.cartService.cartItemCount$.subscribe(count => {
-      this.cartItemCount = count;
+    this.cartService.getCartObservable().subscribe(cart => {
+      this.cartSummary = cart;
     });
   }
 }

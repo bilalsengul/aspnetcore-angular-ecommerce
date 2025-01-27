@@ -177,23 +177,20 @@
   }
 </style>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
   <div class="container">
-    <a class="navbar-brand" href="#">E-Commerce Store</a>
+    <a class="navbar-brand" routerLink="/">E-Commerce Store</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav me-auto">
+      <ul class="navbar-nav ms-auto">
         <li class="nav-item">
-          <a class="nav-link" routerLink="/products" routerLinkActive="active">Products</a>
+          <a class="nav-link" routerLink="/cart">
+            Cart ({{ cartSummary.itemCount }})
+          </a>
         </li>
       </ul>
-      <div class="d-flex align-items-center">
-        <a class="btn btn-outline-light" routerLink="/cart">
-          Cart ({{ cartItemCount }})
-        </a>
-      </div>
     </div>
   </div>
 </nav>
