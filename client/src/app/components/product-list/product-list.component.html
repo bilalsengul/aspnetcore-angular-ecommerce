@@ -8,7 +8,7 @@
         <!-- Filters -->
         <div class="row mb-3">
           <div class="col-md-4">
-            <select class="form-select" [(ngModel)]="selectedCategory" (change)="loadProducts()">
+            <select class="form-select" [(ngModel)]="selectedCategory" (change)="onCategoryChange()">
               <option [ngValue]="null">All Categories</option>
               <option *ngFor="let category of categories" [ngValue]="category.id">
                 {{ category.name }}
@@ -17,11 +17,11 @@
           </div>
           <div class="col-md-4">
             <input type="number" class="form-control" placeholder="Min Price" 
-                   [(ngModel)]="minPrice" (change)="loadProducts()">
+                   [(ngModel)]="minPrice" (change)="onPriceChange()">
           </div>
           <div class="col-md-4">
             <input type="number" class="form-control" placeholder="Max Price" 
-                   [(ngModel)]="maxPrice" (change)="loadProducts()">
+                   [(ngModel)]="maxPrice" (change)="onPriceChange()">
           </div>
         </div>
 
@@ -48,7 +48,7 @@
         </div>
 
         <!-- Simple Pagination -->
-        <div class="d-flex justify-content-center mt-4">
+        <div class="d-flex justify-content-center mt-4" *ngIf="totalPages > 1">
           <nav>
             <ul class="pagination">
               <li class="page-item" [class.disabled]="currentPage === 1">

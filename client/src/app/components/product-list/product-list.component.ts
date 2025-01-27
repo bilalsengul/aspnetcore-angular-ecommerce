@@ -66,17 +66,18 @@ export class ProductListComponent implements OnInit {
   }
 
   onPageChange(page: number): void {
-    this.currentPage = page;
-    this.loadProducts();
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.loadProducts();
+    }
   }
 
-  onCategoryChange(categoryId: number | undefined): void {
-    this.selectedCategory = categoryId;
+  onCategoryChange(): void {
     this.currentPage = 1;
     this.loadProducts();
   }
 
-  onPriceFilterChange(): void {
+  onPriceChange(): void {
     this.currentPage = 1;
     this.loadProducts();
   }
