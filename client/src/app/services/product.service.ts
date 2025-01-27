@@ -23,7 +23,7 @@ export class ProductService {
     categoryId?: number | null,
     minPrice?: number | null,
     maxPrice?: number | null
-  ): Observable<ProductResponse> {
+  ): Observable<Product[] | ProductResponse> {
     let params = new HttpParams()
       .set('pageNumber', (page - 1).toString())  // Convert to 0-based index
       .set('pageSize', pageSize.toString());
@@ -38,7 +38,7 @@ export class ProductService {
       params = params.set('maxPrice', maxPrice.toString());
     }
 
-    return this.http.get<ProductResponse>(`${this.apiUrl}/products`, { params });
+    return this.http.get<Product[] | ProductResponse>(`${this.apiUrl}/products`, { params });
   }
 
   getProduct(id: number): Observable<Product> {

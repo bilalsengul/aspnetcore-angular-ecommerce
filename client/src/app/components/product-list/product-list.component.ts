@@ -17,13 +17,14 @@ import { CartSummary } from '../../models/cart.model';
 export class ProductListComponent implements OnInit {
   products: Product[] = [];
   categories: Category[] = [];
-  selectedCategory: number | undefined;
-  minPrice: number | undefined;
-  maxPrice: number | undefined;
+  selectedCategory: number | null = null;
+  minPrice: number | null = null;
+  maxPrice: number | null = null;
   currentPage = 1;
   pageSize = 10;
   totalItems = 0;
   totalPages = 1;
+  isLoading = false;
   cart: CartSummary = {
     items: [],
     subtotal: 0,
@@ -41,8 +42,26 @@ export class ProductListComponent implements OnInit {
     console.log('ProductListComponent initialized');
     this.loadCategories();
     this.loadProducts();
-    this.cartService.getCartObservable().subscribe(cart => {
-      this.cart = cart;
+    this.cartService.getCartObservable().subscribe({
+      next: (cart) => {
+        this.cart = cart || {
+          items: [],
+          subtotal: 0,
+          vat: 0,
+          total: 0,
+          itemCount: 0
+        };
+      },
+      error: (error) => {
+        console.error('Error loading cart:', error);
+        this.cart = {
+          items: [],
+          subtotal: 0,
+          vat: 0,
+          total: 0,
+          itemCount: 0
+        };
+      }
     });
   }
 
@@ -54,6 +73,7 @@ export class ProductListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading categories:', error);
+        this.categories = [];
       }
     });
   }
@@ -67,6 +87,8 @@ export class ProductListComponent implements OnInit {
       maxPrice: this.maxPrice
     });
 
+    this.isLoading = true;
+
     this.productService.getProducts(
       this.currentPage,
       this.pageSize,
@@ -75,13 +97,35 @@ export class ProductListComponent implements OnInit {
       this.maxPrice
     ).subscribe({
       next: (response) => {
-        console.log('Products loaded:', response);
-        this.products = response.products;
-        this.totalItems = response.totalItems;
-        this.totalPages = Math.ceil(this.totalItems / this.pageSize);
+        console.log('Raw API response:', response);
+        if (Array.isArray(response)) {
+          this.products = response;
+          this.totalItems = response.length;
+          this.totalPages = Math.max(1, Math.ceil(this.totalItems / this.pageSize));
+          console.log('Products loaded successfully:', {
+            products: this.products,
+            totalItems: this.totalItems,
+            totalPages: this.totalPages
+          });
+        } else if (response && response.products) {
+          this.products = response.products;
+          this.totalItems = response.totalItems;
+          this.totalPages = Math.max(1, Math.ceil(this.totalItems / this.pageSize));
+        } else {
+          console.error('Invalid API response format:', response);
+          this.products = [];
+          this.totalItems = 0;
+          this.totalPages = 1;
+        }
       },
       error: (error) => {
         console.error('Error loading products:', error);
+        this.products = [];
+        this.totalItems = 0;
+        this.totalPages = 1;
+      },
+      complete: () => {
+        this.isLoading = false;
       }
     });
   }

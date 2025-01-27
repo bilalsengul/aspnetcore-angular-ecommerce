@@ -41,6 +41,10 @@ export class CartService {
     this.getCart().subscribe();
   }
 
+  getCartId(): string {
+    return this.cartId;
+  }
+
   getCart(): Observable<CartSummary> {
     return this.http.get<CartItem[]>(`${this.apiUrl}/${this.cartId}`).pipe(
       map(items => {
@@ -80,6 +84,20 @@ export class CartService {
     return this.http.delete<void>(`${this.apiUrl}/${itemId}`).pipe(
       map(() => {
         this.loadCart();
+      })
+    );
+  }
+
+  clearCart(): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${this.cartId}`).pipe(
+      map(() => {
+        this.cartSubject.next({
+          items: [],
+          subtotal: 0,
+          vat: 0,
+          total: 0,
+          itemCount: 0
+        });
       })
     );
   }
