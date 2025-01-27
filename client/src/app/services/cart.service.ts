@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { map, switchMap, catchError } from 'rxjs/operators';
 import { CartItem, CartSummary } from '../models/cart.model';
 import { environment } from '../../environments/environment';
 
@@ -81,9 +81,15 @@ export class CartService {
   }
 
   removeFromCart(itemId: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${itemId}`).pipe(
+    return this.http.delete<void>(`${this.apiUrl}/${itemId}`, {
+      params: { cartId: this.cartId }
+    }).pipe(
       map(() => {
         this.loadCart();
+      }),
+      catchError(error => {
+        console.error('Error removing item from cart:', error);
+        throw error;
       })
     );
   }
