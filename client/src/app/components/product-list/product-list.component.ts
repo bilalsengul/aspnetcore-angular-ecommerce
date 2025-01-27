@@ -13,15 +13,15 @@ import { CartSummary } from '../../models/cart.model';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, NgbPagination],
   templateUrl: './product-list.component.html',
-  styles: []
+  styleUrls: ['./product-list.component.css']
 })
 export class ProductListComponent implements OnInit {
   products: Product[] = [];
   categories: Category[] = [];
-  selectedCategory: number | null = null;
-  minPrice: number | null = null;
-  maxPrice: number | null = null;
-  page = 1;
+  selectedCategory: number | undefined;
+  minPrice: number | undefined;
+  maxPrice: number | undefined;
+  currentPage = 1;
   pageSize = 10;
   totalItems = 0;
   cart: CartSummary = {
@@ -40,7 +40,6 @@ export class ProductListComponent implements OnInit {
   ngOnInit(): void {
     this.loadCategories();
     this.loadProducts();
-    this.loadCart();
     this.cartService.getCartObservable().subscribe(cart => {
       this.cart = cart;
     });
@@ -54,41 +53,52 @@ export class ProductListComponent implements OnInit {
 
   loadProducts(): void {
     this.productService.getProducts(
-      this.page,
+      this.currentPage,
       this.pageSize,
-      this.selectedCategory ?? undefined,
-      this.minPrice ?? undefined,
-      this.maxPrice ?? undefined
-    ).subscribe(({ products, totalItems }) => {
-      this.products = products;
-      this.totalItems = totalItems;
+      this.selectedCategory,
+      this.minPrice,
+      this.maxPrice
+    ).subscribe(response => {
+      this.products = response.products;
+      this.totalItems = response.totalItems;
     });
   }
 
-  loadCart(): void {
-    this.cartService.getCart().subscribe(cart => {
-      this.cart = cart;
-    });
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.loadProducts();
   }
 
-  addToCart(product: Product): void {
-    this.cartService.addToCart(product.id, 1).subscribe();
+  onCategoryChange(categoryId: number | undefined): void {
+    this.selectedCategory = categoryId;
+    this.currentPage = 1;
+    this.loadProducts();
   }
 
-  updateQuantity(productId: number, event: Event): void {
-    const quantity = parseInt((event.target as HTMLInputElement).value, 10);
+  onPriceFilterChange(): void {
+    this.currentPage = 1;
+    this.loadProducts();
+  }
+
+  addToCart(productId: number): void {
+    this.cartService.addToCart(productId).subscribe();
+  }
+
+  updateQuantity(itemId: number, quantity: number): void {
     if (quantity > 0) {
-      const cartItem = this.cart.items.find(item => item.productId === productId);
-      if (cartItem) {
-        this.cartService.updateQuantity(cartItem.id, quantity).subscribe();
-      }
+      this.cartService.updateQuantity(itemId, quantity).subscribe();
+    } else {
+      this.removeFromCart(itemId);
     }
   }
 
-  removeFromCart(productId: number): void {
-    const cartItem = this.cart.items.find(item => item.productId === productId);
-    if (cartItem) {
-      this.cartService.removeFromCart(cartItem.id).subscribe();
-    }
+  removeFromCart(itemId: number): void {
+    this.cartService.removeFromCart(itemId).subscribe();
   }
+
+  getQuantityInCart(productId: number): number {
+    const cartItem = this.cart.items.find(item => item.product.id === productId);
+    return cartItem ? cartItem.quantity : 0;
+  }
+} 
 } 

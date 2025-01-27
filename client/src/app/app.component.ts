@@ -22,7 +22,7 @@ export class AppComponent implements OnInit {
 
   constructor(private cartService: CartService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.cartService.getCartObservable().subscribe(cart => {
       this.cartSummary = cart;
     });

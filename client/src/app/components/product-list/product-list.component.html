@@ -35,7 +35,7 @@
                 <p class="card-text">{{ product.description }}</p>
                 <p class="card-text"><strong>Price: ${{ product.price }}</strong></p>
                 <div class="d-flex justify-content-between align-items-center">
-                  <button class="btn btn-primary" (click)="addToCart(product)">
+                  <button class="btn btn-primary" (click)="addToCart(product.id)">
                     Add to Cart
                   </button>
                   <a [routerLink]="['/products', product.id]" class="btn btn-outline-secondary">
@@ -51,7 +51,7 @@
         <div class="d-flex justify-content-center mt-4">
           <ngb-pagination
             [collectionSize]="totalItems"
-            [(page)]="page"
+            [(page)]="currentPage"
             [pageSize]="pageSize"
             (pageChange)="loadProducts()"
           ></ngb-pagination>
@@ -76,7 +76,7 @@
             </div>
             <div class="d-flex align-items-center">
               <input type="number" class="form-control form-control-sm me-2" style="width: 60px"
-                     [value]="item.quantity" (change)="updateQuantity(item.productId, $event)">
+                     [value]="item.quantity" (change)="updateQuantity(item.productId, +$event.target.value)">
               <button class="btn btn-sm btn-danger" (click)="removeFromCart(item.productId)">×</button>
             </div>
           </div>

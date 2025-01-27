@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { map, tap, switchMap } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import { CartItem, CartSummary } from '../models/cart.model';
-import { environment } from '../../environments/environment.development';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -78,7 +78,9 @@ export class CartService {
 
   removeFromCart(itemId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${itemId}`).pipe(
-      tap(() => this.loadCart())
+      map(() => {
+        this.loadCart();
+      })
     );
   }
 
